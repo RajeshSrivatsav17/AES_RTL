@@ -1,8 +1,8 @@
 # AES_RTL
 
 
-## **AES Power Ananlysis Attack Counter Measure (PACM) Design is a 32 bit iterative architecture designed in Verilog HDL
-**
+## AES Power Ananlysis Attack Counter Measure (PACM) Design is a 32 bit iterative architecture designed in Verilog HDL
+
 ## **TOP MODULE:**
 
 The top module consists of a register bank which is used to store the key and plain texts which are loaded from the external environment and the encrypted data is loaded back in the same register bank from which the output can be read. The main objective of this module is to reduce the number of IO ports for the design. Since the core is a 32 – bit iterative core architecture, data or key should be loaded or read in sizes of 32 bits which leads to 32 ports. Using register bank, the number of IO_ports that are required can be reduced to 8 ports. This is created to decrease the number of IO pins during Tapeout.
