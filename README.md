@@ -1,4 +1,4 @@
-# AES_RTL
+## AES_RTL
 
 
 AES Power Ananlysis Attack Counter Measure (PACM) Design is a 32 bit iterative architecture designed in Verilog HDL
@@ -10,7 +10,7 @@ The top module consists of a register bank which is used to store the key and pl
 <img width="405" alt="Screenshot 2021-04-17 at 1 41 59 PM" src="https://user-images.githubusercontent.com/81558273/115106547-182bfc00-9f83-11eb-8eff-7471dfdd2a14.png">
 
 
-**AESDATAPATH CORE DESIGN:**
+# **AESDATAPATH CORE DESIGN:**
 
 The design supports all key variants: 128, 192 and 256 bit for encryption and decryption using the same design. It is a 32-bit core architecture with inbuilt key scheduling module and memory bank of 2KB to store the round key values. 128 bits of data can be given as input and 128 bits of data is obtained as encrypted or decrypted output. Using this design, we can encrypt or decrypt data continuously for a block of data given that the key is unchanged (stream mode). The core consists of modules that perform each operation present in a round. The core is operated in an iterative manner using the control path design. 
 
