@@ -278,7 +278,7 @@ module testbench();
 	
 	aes_if _if (clk);
 
-	AES_top DUT (.IO_CLOCK(clk), 
+	AES_PACM_TOP DUT (.IO_CLOCK(clk), 
 			  .IO_RESET(_if.rstn), 
                           .IO_R_W(~_if.io_rw), 
                           .IO_DATAINOUT(_if.io_datainout), 
