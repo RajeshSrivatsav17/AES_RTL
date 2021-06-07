@@ -1,13 +1,13 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // This file contains all modules consolidated in a SINGLE FILE 
-
-// Engineer: Rajesh Srivatsav Sures
+// *******************************************************************************
+// Engineer: Rajesh Srivatsav Suresh
 // Create Date: 05.05.2019 11:56:48
 // Design: AES 32-bit iterative core design with Power analysis attack countermeasures (PACM)
 // Target Devices: FPGA -- Artix 7 implemented and tested using Virtual Input Output 
-// Revision 0.01 - Final Design
-
+// Revision v1.12 - Final Design
+// *******************************************************************************
 
 /////////////////////////////////////AES_PACM_TOP/////////////////////////////////////////////
 // This module is used for Tapeout purpose where we require a smaller number of IO pins 
