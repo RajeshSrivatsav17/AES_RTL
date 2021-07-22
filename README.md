@@ -1,4 +1,4 @@
-# AES_RTL
+# AES-RTL
 
 
 ## AES Power Ananlysis Attack Counter Measure (PACM) Design is a 32 bit iterative architecture designed in Verilog HDL
