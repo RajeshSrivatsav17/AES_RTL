@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// This file contains all modules consolidated in a SINGLE FILE 
+// -------- THIS FILE CONTAINS ALL MODULES CONSOLIDATED IN A SINGLE FILE --------- 
 // *******************************************************************************
 // Engineer: Rajesh Srivatsav Suresh
 // Create Date: 05.05.2019 11:56:48
