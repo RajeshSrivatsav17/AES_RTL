@@ -1,25 +1,25 @@
 # AES-RTL
 
 
-## AES Power Ananlysis Attack Counter Measure (PACM) Design is a 32 bit iterative architecture designed in Verilog HDL
+## AES Power Ananlysis Attack Counter Measure (PACM) Design :: A 32 bit iterative architecture designed in Verilog HDL
 
 ## **TOP MODULE:**
 
-The top module consists of a register bank which is used to store the key and plain texts which are loaded from the external environment and the encrypted data is loaded back in the same register bank from which the output can be read. The main objective of this module is to reduce the number of IO ports for the design. Since the core is a 32 – bit iterative core architecture, data or key should be loaded or read in sizes of 32 bits which leads to 32 ports. Using register bank, the number of IO_ports that are required can be reduced to 8 ports. This is created to decrease the number of IO pins during Tapeout.
+    The top module consists of a register bank which is used to store the key and plain texts which are loaded from the external environment and the encrypted data is loaded back in the same register bank from which the output can be read. The main objective of this module is to reduce the number of IO ports for the design. Since the core is a 32 – bit iterative core architecture, data or key should be loaded or read in sizes of 32 bits which leads to 32 ports. Using register bank, the number of IO_ports that are required can be reduced to 8 ports. This is created to decrease the number of IO pins during Tapeout.
 
 <img width="405" alt="Screenshot 2021-04-17 at 1 41 59 PM" src="https://user-images.githubusercontent.com/81558273/115106547-182bfc00-9f83-11eb-8eff-7471dfdd2a14.png">
 
 
 ## **AESDATAPATH CORE DESIGN:**
 
-The design supports all key variants: 128, 192 and 256 bit for encryption and decryption using the same design. It is a 32-bit core architecture with inbuilt key scheduling module and memory bank of 2KB to store the round key values. 128 bits of data can be given as input and 128 bits of data is obtained as encrypted or decrypted output. Using this design, we can encrypt or decrypt data continuously for a block of data given that the key is unchanged (stream mode). The core consists of modules that perform each operation present in a round. The core is operated in an iterative manner using the control path design. 
+    The design supports all key variants: 128, 192 and 256 bit for encryption and decryption using the same design. It is a 32-bit core architecture with inbuilt key scheduling module and memory bank of 2KB to store the round key values. 128 bits of data can be given as input and 128 bits of data is obtained as encrypted or decrypted output. Using this design, we can encrypt or decrypt data continuously for a block of data given that the key is unchanged (stream mode). The core consists of modules that perform each operation present in a round. The core is operated in an iterative manner using the control path design. 
 
 Power Analysis attacks are avoided by applying different tasks on the data along with a Pseudo-random number generator that generates a random number for every data. 
 
 ![aes_top](https://user-images.githubusercontent.com/81558273/115106542-0c403a00-9f83-11eb-81dc-d9d5e92057ad.jpg)
 
 ## **KEY SCHEDULING ALGORITHM DESIGN:** 
-The AES Key Expansion takes the Cipher Key K (of Nk bytes) and generates round keys for Nr rounds. So, in total, Nb * (Nr+1) words will be present. 
+    The AES Key Expansion takes the Cipher Key K (of Nk bytes) and generates round keys for Nr rounds. So, in total, Nb * (Nr+1) words will be present. 
 It involves XORing w\[i-1] and w\[i-Nk] columns in the memory to produce round keys. The w\[i-1]th column has to be transformed or not based on the following conditions: 
 1. The current word is in the position equal to multiple of Nk and 
 2. Key is 256 bits and current word’s position satisfies (i mod  Nk == 4). This signal is high only if any of the above is true.
@@ -27,7 +27,7 @@ It involves XORing w\[i-1] and w\[i-Nk] columns in the memory to produce round k
 
 ![ksa_colour](https://user-images.githubusercontent.com/81558273/120992843-9eeda000-c7a0-11eb-9e91-d3219ac215c6.jpg)
 
-This module contains the data path and control path integrated with the memory to store the cipher key and the round keys. This module supplies the AES core module with the required round keys for encryption / decryption. it has an in-built ‘Inverse Mix Column’ implementation along with it to perform equivalent cipher operation. To achieve decryption of any Cipher text, the normal encryption flow followed in the AES CORE module has to be modified slightly, i.e., the data has to flow in a different path to achieve decryption. For decryption, because of using Inverse Mix Columns operation to the Round Keys, the same flow can be maintained, without even the slightest change in the logic or code. 
+    This module contains the data path and control path integrated with the memory to store the cipher key and the round keys. This module supplies the AES core module with the required round keys for encryption / decryption. it has an in-built ‘Inverse Mix Column’ implementation along with it to perform equivalent cipher operation. To achieve decryption of any Cipher text, the normal encryption flow followed in the AES CORE module has to be modified slightly, i.e., the data has to flow in a different path to achieve decryption. For decryption, because of using Inverse Mix Columns operation to the Round Keys, the same flow can be maintained, without even the slightest change in the logic or code. 
 
 This module:
 1.	Receives the Whitening key and start signal of key scheduling from AES TOP.
