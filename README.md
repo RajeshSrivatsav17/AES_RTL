@@ -47,7 +47,7 @@ We performed Floorplanning, Placement, Power Planning and Power Routing, Clock T
 
 #### PLACED AND ROUTED DESIGN LAYOUT OF AES
 
-![image](https://user-images.githubusercontent.com/81558273/135716594-e5c7c17f-1326-4d34-bfc2-864168e072f3.png)
+<img width="534" alt="Screenshot 2021-10-02 at 6 13 00 PM" src="https://user-images.githubusercontent.com/81558273/135716618-5aa6feab-0647-4c1e-bc6e-876e8d62c28b.png">
 
 #### GDS IMPORT AND LAYOUT VIEW OF AES 
 
