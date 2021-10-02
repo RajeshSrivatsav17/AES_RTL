@@ -51,7 +51,7 @@ We performed Floorplanning, Placement, Power Planning and Power Routing, Clock T
 
 ## AES POST-LAYOUT DESIGN SPECIFICATION
 
-<img width="503" alt="Screenshot 2021-10-02 at 6 02 32 PM" src="https://user-images.githubusercontent.com/81558273/135716203-f6c414ba-e629-4fd2-ac61-6e6a4b607ee2.png">
+<img width="503" alt="Screenshot 2021-10-02 at 6 04 08 PM" src="https://user-images.githubusercontent.com/81558273/135716307-e56fd927-9c05-4e82-aa86-d8b20f182d98.png">
 
 ## AES DESIGN MICROGRAPH
 
