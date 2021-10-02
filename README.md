@@ -51,18 +51,7 @@ We performed Floorplanning, Placement, Power Planning and Power Routing, Clock T
 
 #### AES POST-LAYOUT DESIGN SPECIFICATION
 
-Design Architecture       : Iterative Architecture
-No. of I/O pins           : 36 Pins (15 Inputs + 8 InOuts + 2 Outputs + 4 Core Power Pins + 4 IO Power Pins + 3 Dummy)
-Core Area                 : 0.883 mm2
-Chip Area                 : 2.1904 mm2
-Operating Frequency       : 50 MHz
-Operating Voltage         : 1. 8 V
-Power Consumption         : 36.4 mw
-Configurable Keys         : 128-bit, 192-bit, 256-bit
-Address Bus               : 5-bit
-Data Bus                  : 8-bit
-No. of Clock Cycles       : 1290 (128-bit Key), 1515 (192-bit Key), 1781 (256-bit Key)
-Throughput                : 5 Mbps (128-bit Key), 4.2 Mbps (192-bit Key), 3.6 Mbps (256-bit Key)
+<img width="503" alt="Screenshot 2021-10-02 at 6 02 32 PM" src="https://user-images.githubusercontent.com/81558273/135716203-f6c414ba-e629-4fd2-ac61-6e6a4b607ee2.png">
 
 The GDSII of the AES Desing was obtained and sent for tape out to SCL Fabrication laboratory.
 
