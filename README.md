@@ -51,8 +51,8 @@ We performed Floorplanning, Placement, Power Planning and Power Routing, Clock T
 
 #### AES POST-LAYOUT DESIGN SPECIFICATION
 
-**Design Architecture**       : Iterative Architecture
-**No. of I/O pins**           : 36 Pins (15 Inputs + 
+Design Architecture       : Iterative Architecture.
+No. of I/O pins           : 36 Pins (15 Inputs + 
                                           8 InOuts + 
                                           2 Outputs + 
                                           4 Core Power Pins + 
