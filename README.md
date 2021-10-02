@@ -41,4 +41,40 @@ This module:
 4.	Upon a read request from AES TOP to read a round key, KSA returns a 32 bit round key by fetching the key information from the KSA_MEMORY using addr which is provied by AES Control path.
 
 ## Future Work Performed with the RTL Design
-The AES RTL design was taken and back-end design flow was performed on the design. The back-end design was performed under Semiconductor Laboratory's 180nm technology (https://scl.gov.in/). Starting from logic synthesis on creating the netlist using the technology files, 
+The AES RTL design was taken and back-end design flow was performed on the design. The back-end design was performed under Semiconductor Laboratory's 180nm technology (https://scl.gov.in/). Starting from logic synthesis on creating the netlist using the technology files, physical design was continued. 
+We performed Floorplanning, Placement, Power Planning and Power Routing, Clock Tree Synthesis, Routing and Timing sign-off and verified post timing sign-off using the standard delay file obtained from the timing sign-off tool.
+
+#### Layout design of AES
+
+![image](https://user-images.githubusercontent.com/81558273/135715392-da3825bf-045e-4596-aa4c-13fd10504164.png)
+
+#### AES POST-LAYOUT DESIGN SPECIFICATION:
+
+**Design Architecture**       : Iterative Architecture
+**No. of I/O pins**           : 36 Pins (15 Inputs + 
+                                          8 InOuts + 
+                                          2 Outputs + 
+                                          4 Core Power Pins + 
+                                          4 IO Power Pins + 
+                                          3 Dummy)
+**Core Area**                 : 0.883 mm2
+**Chip Area**                 : 2.1904 mm2
+**Operating Frequency**       : 50 MHz
+**Operating Voltage**         : 1. 8 V
+**Power Consumption**         : 36.4 mw
+**Configurable Keys**         : 128-bit, 192-bit, 256-bit
+**Address Bus**               : 5-bit
+**Data Bus**                  : 8-bit
+**No. of Clock Cycles**       : 1290      (128-bit Key),
+                                1515      (192-bit Key),
+                                1781      (256-bit Key)
+**Throughput**                : 5 Mbps    (128-bit Key),
+                                4.2 Mbps  (192-bit Key),
+                                3.6 Mbps  (256-bit Key)
+
+The GDSII of the AES Desing was obtained and sent for tape out to SCL Fabrication laboratory.
+
+#### AES DESIGN MICROGRAPH
+
+![112](https://user-images.githubusercontent.com/81558273/135715636-3f6f46e3-367c-48a4-9ca4-358e27b530f5.jpg)
+
