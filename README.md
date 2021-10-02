@@ -77,5 +77,4 @@ The GDSII of the AES Desing was obtained and sent for tape out to SCL Fabricatio
 
 #### AES DESIGN MICROGRAPH
 
-![112](https://user-images.githubusercontent.com/81558273/135715636-3f6f46e3-367c-48a4-9ca4-358e27b530f5.jpg)
-
+![112](https://user-images.githubusercontent.com/81558273/135715741-4a823ead-f3e6-4c11-92b3-90cfb8d52e74.jpeg)
