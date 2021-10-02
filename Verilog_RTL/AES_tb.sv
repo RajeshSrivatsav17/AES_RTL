@@ -17,8 +17,8 @@
 //---------------------------------------------------------------------------------
 `timescale 1ns / 1ps 
 class transactions;
-	bit [255:0] key;
-	bit [3:0] opcode; 
+	bit [255:0] keyMODE
+	bit [3:0] opcode; //  MODE[1:0], D_K, E_D
 	bit [127:0] cptext;
 	integer set_key;
 endclass
