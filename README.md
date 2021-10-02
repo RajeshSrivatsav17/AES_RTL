@@ -7,6 +7,8 @@
 
 The top module consists of a register bank which is used to store the key and plain texts which are loaded from the external environment and the encrypted data is loaded back in the same register bank from which the output can be read. The main objective of this module is to reduce the number of IO ports for the design. Since the core is a 32 – bit iterative core architecture, data or key should be loaded or read in sizes of 32 bits which leads to 32 ports. Using register bank, the number of IO_ports that are required can be reduced to 8 ports. This is created to decrease the number of IO pins during Tapeout.
 
+#### OUTER BLOCK DIAGRAM
+
 <img width="405" alt="Screenshot 2021-04-17 at 1 41 59 PM" src="https://user-images.githubusercontent.com/81558273/115106547-182bfc00-9f83-11eb-8eff-7471dfdd2a14.png">
 
 #### PORT DETAILS
