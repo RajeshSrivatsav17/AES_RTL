@@ -49,12 +49,12 @@ We performed Floorplanning, Placement, Power Planning and Power Routing, Clock T
 
 ![image](https://user-images.githubusercontent.com/81558273/135715392-da3825bf-045e-4596-aa4c-13fd10504164.png)
 
-#### AES POST-LAYOUT DESIGN SPECIFICATION
+## AES POST-LAYOUT DESIGN SPECIFICATION
 
 <img width="503" alt="Screenshot 2021-10-02 at 6 02 32 PM" src="https://user-images.githubusercontent.com/81558273/135716203-f6c414ba-e629-4fd2-ac61-6e6a4b607ee2.png">
 
-The GDSII of the AES Desing was obtained and sent for tape out to SCL Fabrication laboratory.
+## AES DESIGN MICROGRAPH
 
-#### AES DESIGN MICROGRAPH
+The GDSII of the AES Desing was obtained and sent for tape out to SCL Fabrication laboratory. Below is a snapshot of the micrograph.
 
 ![112](https://user-images.githubusercontent.com/81558273/135715741-4a823ead-f3e6-4c11-92b3-90cfb8d52e74.jpeg)
