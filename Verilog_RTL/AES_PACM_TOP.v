@@ -51,6 +51,15 @@ module AES_PACM_TOP(    IO_DATAINOUT,
 	
 	reg [7:0] MEM_I [31:0];
 	
+	//MODE[1:0] decoding ::
+	//MODE[1:0] == 2'b00 || 2'b01 --> 128 bit encryption/decryption
+	//MODE[1:0] == 2'b10          --> 192 bit encryption/decryption
+	//MODE[1:0] == 2'b11          --> 256 bit encryption/decryption
+	
+	//D_K mentions if the incoming MEM_I represents Data/ Whitening Key
+
+	//E_D mentions if the operation to be performed is encryption/ decryption
+	
 	assign {MODE[1],MODE[0],E_D,D_K}=OPCODE;
 	
 	assign mem_128_1 = { MEM_I[0],MEM_I[1],MEM_I[2],MEM_I[3],MEM_I[4],MEM_I[5],MEM_I[6],MEM_I[7],
