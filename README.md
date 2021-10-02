@@ -1,5 +1,5 @@
 # AES-RTL 
-**(Project taken as a part of tape out of AES Design)**
+**(Project taken as a part of tape out of AES Design -- Refer Future work section below)**
 
 ## AES Power Ananlysis Attack Counter Measure (PACM) Design :: A 32 bit iterative architecture designed in Verilog HDL
 
@@ -8,6 +8,10 @@
 The top module consists of a register bank which is used to store the key and plain texts which are loaded from the external environment and the encrypted data is loaded back in the same register bank from which the output can be read. The main objective of this module is to reduce the number of IO ports for the design. Since the core is a 32 – bit iterative core architecture, data or key should be loaded or read in sizes of 32 bits which leads to 32 ports. Using register bank, the number of IO_ports that are required can be reduced to 8 ports. This is created to decrease the number of IO pins during Tapeout.
 
 <img width="405" alt="Screenshot 2021-04-17 at 1 41 59 PM" src="https://user-images.githubusercontent.com/81558273/115106547-182bfc00-9f83-11eb-8eff-7471dfdd2a14.png">
+
+#### PORT DETAILS
+
+<img width="458" alt="Screenshot 2021-10-02 at 5 08 31 PM" src="https://user-images.githubusercontent.com/81558273/135714420-4a898e3a-de37-439a-8a7f-e1cb9a22c4b0.png">
 
 ## **AESDATAPATH CORE DESIGN:**
 
@@ -32,3 +36,6 @@ This module:
 1.	Receives the Whitening key and start signal of key scheduling from AES TOP.
 2.	Computes the Round keys as a standalone module.
 4.	Upon a read request from AES TOP to read a round key, KSA returns a 32 bit round key by fetching the key information from the KSA_MEMORY using addr which is provied by AES Control path.
+
+## Future Work Performed with the RTL Design
+The AES RTL design was taken and back-end design flow was performed on the design. The back-end design was performed under Semiconductor Laboratory's 180nm technology (https://scl.gov.in/). Starting from logic synthesis on creating the netlist using the technology files, 
