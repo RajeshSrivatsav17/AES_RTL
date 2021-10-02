@@ -58,6 +58,7 @@ We performed Floorplanning, Placement, Power Planning and Power Routing, Clock T
                                           4 Core Power Pins + 
                                           4 IO Power Pins + 
                                           3 Dummy)
+                                   
 **Core Area**                 : 0.883 mm2
 **Chip Area**                 : 2.1904 mm2
 **Operating Frequency**       : 50 MHz
