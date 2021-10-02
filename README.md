@@ -45,7 +45,11 @@ This module:
 The AES RTL design was taken and back-end design flow was performed on the design. The back-end design was performed under Semiconductor Laboratory's 180nm technology (https://scl.gov.in/). Starting from logic synthesis on creating the netlist using the technology files, physical design was continued. 
 We performed Floorplanning, Placement, Power Planning and Power Routing, Clock Tree Synthesis, Routing and Timing sign-off and verified post timing sign-off using the standard delay file obtained from the timing sign-off tool.
 
-#### Layout design of AES
+#### PLACED AND ROUTED DESIGN LAYOUT OF AES
+
+![image](https://user-images.githubusercontent.com/81558273/135716594-e5c7c17f-1326-4d34-bfc2-864168e072f3.png)
+
+#### GDS IMPORT AND LAYOUT VIEW OF AES 
 
 ![image](https://user-images.githubusercontent.com/81558273/135715392-da3825bf-045e-4596-aa4c-13fd10504164.png)
 
