@@ -11,7 +11,7 @@ The top module consists of a register bank which is used to store the key and pl
 
 #### PORT DETAILS
 
-<img width="458" alt="Screenshot 2021-10-02 at 5 08 31 PM" src="https://user-images.githubusercontent.com/81558273/135714420-4a898e3a-de37-439a-8a7f-e1cb9a22c4b0.png">
+<img width="502" alt="Screenshot 2021-10-02 at 5 32 44 PM" src="https://user-images.githubusercontent.com/81558273/135715239-43614e0f-05f3-4598-872c-23174005f6ab.png">
 
 ## **AESDATAPATH CORE DESIGN:**
 
@@ -22,6 +22,7 @@ Power Analysis attacks are avoided by applying different tasks on the data along
 ![aes_top](https://user-images.githubusercontent.com/81558273/115106542-0c403a00-9f83-11eb-81dc-d9d5e92057ad.jpg)
 
 ## **KEY SCHEDULING ALGORITHM DESIGN:** 
+
 The AES Key Expansion takes the Cipher Key K (of Nk bytes) and generates round keys for Nr rounds. So, in total, Nb * (Nr+1) words will be present. 
 It involves XORing w\[i-1] and w\[i-Nk] columns in the memory to produce round keys. The w\[i-1]th column has to be transformed or not based on the following conditions: 
 1. The current word is in the position equal to multiple of Nk and 
