@@ -22,8 +22,6 @@ The design supports all key variants: 128, 192 and 256 bit for encryption and de
 
 Power Analysis attacks are avoided by applying different tasks on the data along with a Pseudo-random number generator that generates a random number for every data. 
 
-![aes_top](https://user-images.githubusercontent.com/81558273/115106542-0c403a00-9f83-11eb-81dc-d9d5e92057ad.jpg)
-
 <img width="748" alt="Screenshot 2021-10-02 at 5 45 26 PM" src="https://user-images.githubusercontent.com/81558273/135715652-b5a67e28-728f-4ca3-b702-e671f730fcb6.png">
 
 ## **KEY SCHEDULING ALGORITHM DESIGN:** 
