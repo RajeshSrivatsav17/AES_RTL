@@ -13,7 +13,7 @@
 // This module is used for Tapeout purpose where we require a smaller number of IO pins 
 // 8-bit read write ports are present in this module with a Memory file which holds the inputs together and sends packets of 32 bits 
 // to the core AES IP. 
-module AES_PACM_TOP(    IO_DATAINOUT,
+module AES_PACM_TOP(    			IO_DATAINOUT,
 						IO_R_W,
 						IO_OPCODE,
 						IO_CLOCK,
