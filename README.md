@@ -19,8 +19,6 @@ A byte-addressable register bank stores the plain text (data) or the whitening k
 
 The design supports all key variants: 128, 192, and 256 bit for encryption and decryption using the same core. It is a 32-bit architecture with an inbuilt key scheduling module and memory bank of 2KB to store the round-key values. Storing round key values help in better performance while encryption or decryption because of direct fetches from the Key memory and also, if the whitening key is maintained, a stream of data can be encrypted and decrypted with Key Scheduling Algorithm block run only once. 128 bits of data is given as input and 128 bits of data is obtained as encrypted or decrypted output. The core consists of modules that perform each operation present in a round. The data path design is operated in an iterative manner using the control path design. 
 
-Power Analysis attacks are avoided by applying different tasks on the data along with a Pseudo-random number generator that generates a random number for every data. 
-
 <img width="748" alt="Screenshot 2021-10-02 at 5 45 26 PM" src="https://user-images.githubusercontent.com/81558273/135715652-b5a67e28-728f-4ca3-b702-e671f730fcb6.png">
 
 ## **KEY SCHEDULING ALGORITHM DESIGN:** 
@@ -41,7 +39,7 @@ This module:
 4.	Upon a read request from AES TOP to read a round key, KSA returns a 32 bit round key by fetching the key information from the KSA_MEMORY using the address which is provided by the AES Control path.
 
 ## Future Work Performed with the RTL Design
-The AES RTL design was taken and back-end design flow was performed on the design. The back-end design was performed under Semiconductor Laboratory's 180nm technology (https://scl.gov.in/). Starting from logic synthesis on creating the netlist using the technology files, physical design was continued. 
+The AES RTL design was taken and back-end design flow was performed on the design. The back-end design was performed under Semiconductor Laboratory's 180nm technology. Starting from logic synthesis on creating the netlist using the technology files, physical design was continued. 
 We performed Floorplanning, Placement, Power Planning and Power Routing, Clock Tree Synthesis, Routing and Timing sign-off and verified post timing sign-off using the standard delay file obtained from the timing sign-off tool.
 
 #### GDS IMPORT AND LAYOUT VIEW OF AES 
