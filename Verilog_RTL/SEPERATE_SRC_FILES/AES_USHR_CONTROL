@@ -1,0 +1,399 @@
+
+
+
+//////////////////////////////////////////////USHR CONTROL MODULE////////////////////////////////////////////////////////
+module AES_USHR_CONTROL(
+                         DATA_IN_IO,
+                         CLOCK,
+                         RESET,
+                         E_D,
+                         b,
+                         R0,
+                         R1,
+                         SBOX_ACTIVE,
+                         IO_DATALATCH,  
+                         IO_DATA_RW ,
+                         DATA_DONE ,
+                         DATA_REG_TO_KSA_MEM,
+                         DATA_OUT,
+                         COUNT,
+                         PARALLEL_OUT_DATA,
+                         PARALLEL_OUT_RANDOM,
+                         LD,
+                         ST,
+                         MIX_ACTIVE,
+                         SHIFT_ACTIVE,
+                         D_K,
+                         RANDOM_8_IN,
+                         DATA_8_IN,
+                         ROUND_DATA_32_IN,
+                         RANDOM_8_OUT,
+                         DATA_8_OUT,
+                         ROUND_DATA_32,
+                         KEYLOADED_CP,       
+                         KEY_MODE
+                         ,S0,S1
+                        ,KEY_IN
+                        ,RANDOM_NUMBER
+                        ,LOAD_WAIT
+                        ,KSA_KEYSTART);
+                    
+    input       [31:0]      DATA_IN_IO;
+    input                   RESET;
+    input                   CLOCK;
+    input                   E_D;
+    input       [31:0]      ROUND_DATA_32_IN;
+    input                   b;
+    input                   R1;
+    input                   R0;
+    input                   S0;
+    input                   S1;
+    input                   SBOX_ACTIVE;
+    input                   LD;
+    input                   ST;
+    input                   MIX_ACTIVE;
+    input                   SHIFT_ACTIVE;
+    input                   IO_DATALATCH;
+    input                   D_K;
+    input                   IO_DATA_RW ;
+    input                   DATA_DONE ;
+    input       [7:0]       RANDOM_8_IN,DATA_8_IN;
+    input       [1:0]       KEY_MODE;
+    input       [31:0]      RANDOM_NUMBER;
+    input       [31:0]      KEY_IN;
+    
+    output                  KSA_KEYSTART;
+    output      [31:0]      DATA_REG_TO_KSA_MEM;
+    output      [31:0]      DATA_OUT;
+    output      [7:0]       RANDOM_8_OUT,DATA_8_OUT;
+    output      [31:0]      ROUND_DATA_32 ;
+    output      [127:0]     PARALLEL_OUT_DATA;
+    output      [127:0]     PARALLEL_OUT_RANDOM;
+    output reg  [3:0]       COUNT;
+    output reg              LOAD_WAIT;
+    output reg              KEYLOADED_CP;
+    
+    wire        [1:0]       USHR_mode0_data;
+    wire        [1:0]       USHR_mode1_data;
+    wire        [1:0]       USHR_mode2_data;
+    wire        [1:0]       USHR_mode3_data;
+    wire        [1:0]       USHR_mode0_random;
+    wire        [1:0]       USHR_mode1_random;
+    wire        [1:0]       USHR_mode2_random;
+    wire        [1:0]       USHR_mode3_random;
+     
+    wire        [15:0]      CONTROL_2X1_MUX_SBOX_RANDOM;
+    wire        [15:0]      CONTROL_2X1_MUX_SBOX_DATA;
+    
+    wire        [31:0]      SERIAL_RIGHT_DATA_OUT;
+    wire        [31:0]      SERIAL_LEFT_DATA_OUT ;
+    wire        [31:0]      SERIAL_RIGHT_RANDOM_OUT;
+    wire        [31:0]      SERIAL_LEFT_RANDOM_OUT;
+    wire        [31:0]      SERIAL_LEFT_DATA_MUX_SELECTED;
+    wire        [31:0]      SERIAL_LEFT_DATA_IN;
+    wire        [31:0]      SERIAL_RIGHT_RANDOM_IN;
+    wire        [31:0]      data_32_out;
+    wire        [31:0]      RANDOM_32_out;
+    wire        [31:0]      round_data_load;
+    wire        [31:0]      round_RANDOM_load;
+    
+    wire        [127:0]     RANDOM_WIRE_128;
+    wire        [127:0]     SHIFT_ROWS_OR_INVERSE_SHIFT_ROWS_OUT_DATA;
+    wire        [127:0]     SHIFT_ROWS_OR_INVERSE_SHIFT_ROWS_OUT_RANDOM;
+    wire        [127:0]     DATA_WIRE_128;
+    wire        [127:0]     SHIFT_ROWS_DATA_OUT;
+    wire        [127:0]     INV_SHIFT_ROWS_DATA_OUT;
+    wire        [127:0]     SHIFT_ROWS_RANDOM_OUT;
+    wire        [127:0]     INV_SHIFT_ROWS_RANDOM_OUT;
+    wire        [127:0]     Parallel_in_RANDOM;
+    wire        [127:0]     Parallel_in_data;
+    reg                     ula;
+    reg                     KEY_WAIT_LOCAL;
+    reg                     STATE_FOR_D_K_REG_LOAD;
+    reg                     STATE_FOR_KSA_MEM_LOAD;
+    
+    reg         [3:0]       COUNT_value;                
+    
+
+    assign round_data_load           =  SBOX_ACTIVE ? {DATA_8_IN,DATA_8_IN,DATA_8_IN,DATA_8_IN} : ROUND_DATA_32_IN   ;
+    assign round_RANDOM_load         =  SBOX_ACTIVE ? {RANDOM_8_IN,RANDOM_8_IN,RANDOM_8_IN,RANDOM_8_IN} : ROUND_DATA_32_IN;
+    assign DATA_WIRE_128             =  {round_data_load,round_data_load,round_data_load,round_data_load} ;
+    assign RANDOM_WIRE_128           =  {round_RANDOM_load,round_RANDOM_load,round_RANDOM_load,round_RANDOM_load};
+    assign Parallel_in_data          =  SHIFT_ACTIVE ? SHIFT_ROWS_OR_INVERSE_SHIFT_ROWS_OUT_DATA : DATA_WIRE_128;
+    assign  Parallel_in_RANDOM       =  SHIFT_ACTIVE ?  SHIFT_ROWS_OR_INVERSE_SHIFT_ROWS_OUT_RANDOM : RANDOM_WIRE_128;
+    
+    assign KSA_KEYSTART = KEY_WAIT_LOCAL;
+    
+    
+    always @(posedge CLOCK)
+    begin
+        if(~RESET)
+        begin
+    STATE_FOR_D_K_REG_LOAD <= 0;
+    ula <= 0;
+    STATE_FOR_KSA_MEM_LOAD <= 0;
+    COUNT <= 0;
+    KEY_WAIT_LOCAL <= 0;
+    LOAD_WAIT <= 1;
+    KEYLOADED_CP <= 1;
+     if (KEY_MODE==2)
+    COUNT_value <= 6;
+    
+    else if (KEY_MODE==3)
+    COUNT_value <= 8;
+    
+    else //(KEY_MODE==1 || KEY_MODE==0)
+    COUNT_value <= 4;
+    
+        end
+        
+        else if (RESET)
+        begin
+        if (LD==1 && ST==0 && IO_DATALATCH && ~STATE_FOR_D_K_REG_LOAD && ~KEY_WAIT_LOCAL )
+                       begin
+                                        if(ula)
+                                        begin
+                                                   STATE_FOR_D_K_REG_LOAD <= 1;
+                                                   if(~D_K && KEYLOADED_CP)///COUNT value ust be unchanged even aftr n CLOCK cycles after key loading  
+                                                       COUNT <= COUNT+1;
+                                                    else if(D_K )
+                                                         begin
+                                                       COUNT <= COUNT-1;
+                                                         end
+                                                    else 
+                                                       COUNT <= COUNT     ; 
+                                                       end
+                                        else 
+                                        ula <= 1;
+                                                                  
+                         end
+    
+         else if (DATA_DONE && IO_DATA_RW && IO_DATALATCH && ~STATE_FOR_D_K_REG_LOAD)
+               begin
+                              STATE_FOR_D_K_REG_LOAD <= 1;
+                end
+        
+          ////now the conditions are to reset the control signals ....STATE_FOR_D_K_REG_LOAD   and    parallel_load_state
+        if(~IO_DATALATCH)
+        begin
+                STATE_FOR_D_K_REG_LOAD <= 0;
+                ula <= 0;
+        end
+                         
+        if(COUNT==COUNT_value  &&   ~D_K  &&  ~KEY_WAIT_LOCAL && KEYLOADED_CP)
+             begin
+                COUNT <= 0;
+                KEY_WAIT_LOCAL <= 1;
+            end
+        
+        if(KEY_WAIT_LOCAL)
+             begin
+                if(STATE_FOR_KSA_MEM_LOAD)
+                COUNT <= COUNT+1;
+        
+                if(COUNT==COUNT_value-1  && STATE_FOR_KSA_MEM_LOAD)
+                    begin
+                        KEY_WAIT_LOCAL <= 0;
+                        COUNT <= 4;   
+                        KEYLOADED_CP <= 0;
+                    end
+                    
+                 STATE_FOR_KSA_MEM_LOAD <= 0;               
+             end
+        
+        
+        if(D_K && COUNT==0)
+               LOAD_WAIT <= 0;
+               
+               
+        if ( ~STATE_FOR_KSA_MEM_LOAD && KEY_WAIT_LOCAL)
+                STATE_FOR_KSA_MEM_LOAD <= 1;       
+               
+         if (DATA_DONE )
+            begin
+            LOAD_WAIT <= 1;
+            COUNT <= 4;
+            end
+            
+      end  //// reset ends here
+    end    ////always@ (posedge clock) ends here
+      
+           
+     assign USHR_mode0_data=             
+     (LD) && (~ST) && (~SHIFT_ACTIVE) && (~MIX_ACTIVE) && (~SBOX_ACTIVE) && (IO_DATALATCH) && (~STATE_FOR_D_K_REG_LOAD) && ~IO_DATA_RW && ula? ///initial data load state right shift 
+       ~KEY_WAIT_LOCAL &&   (D_K && ~KEYLOADED_CP || ~D_K && KEYLOADED_CP)  ? 1 : KEY_WAIT_LOCAL ? 2 : 0 : ///if key has been loaded and we are trying to load again ushr mode will be 0 ....else ushr mode will be 1
+      ~LD && ST && SHIFT_ACTIVE && ~MIX_ACTIVE && ~SBOX_ACTIVE    ? 3 : ////parallel load if shift load is high
+       ~LD && ST  && SBOX_ACTIVE ? 3:                ///////if subactive is high then all ushr modes must be 3 and the control goes to the 2x1 muxes 
+      ~LD && ST  ? {(~b) && (~R1) && (~R0), (~b) && (~R1) && (~R0)} : /////this logic is used to select the round data loading ushr register
+      ~SHIFT_ACTIVE && ~MIX_ACTIVE && ~SBOX_ACTIVE && IO_DATALATCH && DATA_DONE && IO_DATA_RW   || (KEY_WAIT_LOCAL && STATE_FOR_KSA_MEM_LOAD) ? 2 : 0;
+      ////IF DATA DONE IS HIGH ALL THE VALUES WILL BE SHFTD OUT IF I DATA LATCH IS HIGH
+      ////THIS HAS TO BE CHANGED ....DIDNT EXOR RANDOM AND DATA IN THE LAST ROUND 
+      
+      
+      
+      
+      assign USHR_mode1_data=             
+      (LD) && (~ST) && (~SHIFT_ACTIVE) && (~MIX_ACTIVE) && (~SBOX_ACTIVE) && (IO_DATALATCH) && (~STATE_FOR_D_K_REG_LOAD) && ~IO_DATA_RW && ula? 
+       ~KEY_WAIT_LOCAL && (D_K && ~KEYLOADED_CP || ~D_K && KEYLOADED_CP)  ? 1 : KEY_WAIT_LOCAL ? 2 : 0 :
+       ~LD && ST && SHIFT_ACTIVE && ~MIX_ACTIVE && ~SBOX_ACTIVE    ? 3 :
+        ~LD && ST  && SBOX_ACTIVE ? 3:
+       ~LD && ST  ? {(~b) && (~R1) && (R0), (~b) && (~R1) && (R0)} :
+       ~SHIFT_ACTIVE && ~MIX_ACTIVE && ~SBOX_ACTIVE && IO_DATALATCH && DATA_DONE && IO_DATA_RW  || (KEY_WAIT_LOCAL && STATE_FOR_KSA_MEM_LOAD)  ? 2 : 0;
+       
+       
+      assign USHR_mode2_data=             
+       (LD) && (~ST) && (~SHIFT_ACTIVE) && (~MIX_ACTIVE) && (~SBOX_ACTIVE) && (IO_DATALATCH) && (~STATE_FOR_D_K_REG_LOAD) && ~IO_DATA_RW && ula? 
+       ~KEY_WAIT_LOCAL && (D_K && ~KEYLOADED_CP || ~D_K && KEYLOADED_CP) ? 1 : KEY_WAIT_LOCAL ? 2  : 0 :
+        ~LD && ST && SHIFT_ACTIVE && ~MIX_ACTIVE && ~SBOX_ACTIVE    ? 3 :
+         ~LD && ST  && SBOX_ACTIVE ? 3:
+        ~LD && ST  ? {(~b) && (R1) && (~R0), (~b) && (R1) && (~R0)} :
+        ~SHIFT_ACTIVE && ~MIX_ACTIVE && ~SBOX_ACTIVE && IO_DATALATCH && DATA_DONE && IO_DATA_RW  || (KEY_WAIT_LOCAL && STATE_FOR_KSA_MEM_LOAD) ? 2 : 0;
+        
+        
+       assign USHR_mode3_data=             
+        (LD) && (~ST) && (~SHIFT_ACTIVE) && (~MIX_ACTIVE) && (~SBOX_ACTIVE) && (IO_DATALATCH) && (~STATE_FOR_D_K_REG_LOAD) && ~IO_DATA_RW && ula? 
+         ~KEY_WAIT_LOCAL && (D_K && ~KEYLOADED_CP || ~D_K && KEYLOADED_CP)  ? 1 : KEY_WAIT_LOCAL ? 2 : 0 :
+         ~LD && ST && SHIFT_ACTIVE && ~MIX_ACTIVE && ~SBOX_ACTIVE    ? 3 :
+          ~LD && ST  && SBOX_ACTIVE ? 3:
+         ~LD && ST  ? {(~b) && (R1) && (R0) , (~b) && (R1) && (R0) } :
+         ~SHIFT_ACTIVE && ~MIX_ACTIVE && ~SBOX_ACTIVE && IO_DATALATCH && DATA_DONE && IO_DATA_RW  || (KEY_WAIT_LOCAL && STATE_FOR_KSA_MEM_LOAD) ? 2 : 0;
+         
+         
+       assign USHR_mode0_random=             
+          (LD) && (~ST) && (~SHIFT_ACTIVE) && (~MIX_ACTIVE) && (~SBOX_ACTIVE) && (IO_DATALATCH) && (~STATE_FOR_D_K_REG_LOAD) && ~IO_DATA_RW && ula? 
+       ~KEY_WAIT_LOCAL && (D_K && ~KEYLOADED_CP || ~D_K && KEYLOADED_CP) ? 1 : KEY_WAIT_LOCAL ? 2 : 0 :
+           ~LD && ST && SHIFT_ACTIVE && ~MIX_ACTIVE && ~SBOX_ACTIVE    ? 3 :
+            ~LD && ST  && SBOX_ACTIVE ? 3:
+           ~LD && ST  ? {(b) && (~R1) && (~R0), (b) && (~R1) && (~R0)}  :
+           ~SHIFT_ACTIVE && ~MIX_ACTIVE && ~SBOX_ACTIVE && IO_DATALATCH && DATA_DONE && IO_DATA_RW  || (KEY_WAIT_LOCAL && STATE_FOR_KSA_MEM_LOAD) ? 2 : 0;
+           
+           
+        assign USHR_mode1_random=             
+           (LD) && (~ST) && (~SHIFT_ACTIVE) && (~MIX_ACTIVE) && (~SBOX_ACTIVE) && (IO_DATALATCH) && (~STATE_FOR_D_K_REG_LOAD) && ~IO_DATA_RW && ula? 
+        ~KEY_WAIT_LOCAL &&  (D_K && ~KEYLOADED_CP || ~D_K && KEYLOADED_CP)  ? 1 : KEY_WAIT_LOCAL ? 2 : 0 :
+            ~LD && ST && SHIFT_ACTIVE && ~MIX_ACTIVE && ~SBOX_ACTIVE    ? 3 :
+             ~LD && ST  && SBOX_ACTIVE ? 3:
+            ~LD && ST  ? {(b) && (~R1) && (R0), (b) && (~R1) && (R0)} :
+            ~SHIFT_ACTIVE && ~MIX_ACTIVE && ~SBOX_ACTIVE && IO_DATALATCH && DATA_DONE && IO_DATA_RW  || (KEY_WAIT_LOCAL && STATE_FOR_KSA_MEM_LOAD) ? 2 : 0;
+            
+            
+        assign USHR_mode2_random=             
+            (LD) && (~ST) && (~SHIFT_ACTIVE) && (~MIX_ACTIVE) && (~SBOX_ACTIVE) && (IO_DATALATCH) && (~STATE_FOR_D_K_REG_LOAD) && ~IO_DATA_RW && ula? 
+          ~KEY_WAIT_LOCAL &&  (D_K && ~KEYLOADED_CP || ~D_K && KEYLOADED_CP)? 1 : KEY_WAIT_LOCAL ? 2 : 0 :
+             ~LD && ST && SHIFT_ACTIVE && ~MIX_ACTIVE && ~SBOX_ACTIVE    ? 3 :
+              ~LD && ST  && SBOX_ACTIVE ? 3:
+             ~LD && ST  ? {(b) && (R1) && (~R0), (b) && (R1) && ( ~R0)} :
+             ~SHIFT_ACTIVE && ~MIX_ACTIVE && ~SBOX_ACTIVE && IO_DATALATCH && DATA_DONE && IO_DATA_RW  || (KEY_WAIT_LOCAL && STATE_FOR_KSA_MEM_LOAD)  ? 2 : 0;
+             
+             
+        assign USHR_mode3_random=             
+             (LD) && (~ST) && (~SHIFT_ACTIVE) && (~MIX_ACTIVE) && (~SBOX_ACTIVE) && (IO_DATALATCH) && (~STATE_FOR_D_K_REG_LOAD) && ~IO_DATA_RW && ula? 
+           ~KEY_WAIT_LOCAL &&   (D_K && ~KEYLOADED_CP || ~D_K && KEYLOADED_CP) ? 1 : KEY_WAIT_LOCAL ? 2 : 0 :
+              ~LD && ST && SHIFT_ACTIVE && ~MIX_ACTIVE && ~SBOX_ACTIVE    ? 3 :
+               ~LD && ST  && SBOX_ACTIVE ? 3:
+              ~LD && ST  ? {(b) && (R1) && (R0) , (b) && (R1) && (R0) } :
+              ~SHIFT_ACTIVE && ~MIX_ACTIVE && ~SBOX_ACTIVE && IO_DATALATCH && DATA_DONE && IO_DATA_RW  || (KEY_WAIT_LOCAL && STATE_FOR_KSA_MEM_LOAD)  ? 2 : 0;
+    
+    
+    
+    assign DATA_REG_TO_KSA_MEM               =          SERIAL_LEFT_DATA_OUT;
+    assign DATA_OUT                          =          SERIAL_LEFT_DATA_OUT ^ SERIAL_LEFT_RANDOM_OUT ;
+    assign SERIAL_LEFT_DATA_IN               = D_K?     DATA_IN_IO  ^ KEY_IN  ^  RANDOM_NUMBER : DATA_IN_IO;
+    assign SERIAL_LEFT_DATA_MUX_SELECTED     =          SERIAL_LEFT_RANDOM_OUT;
+    assign SERIAL_RIGHT_RANDOM_IN            = D_K ?    RANDOM_NUMBER : SERIAL_RIGHT_DATA_OUT;
+    
+    AES_USHR_CUSTOM DATA_x_1 (.CLOCK(CLOCK ), .RESET( RESET), .Serial_in_L ( SERIAL_LEFT_DATA_MUX_SELECTED ), .Serial_in_R( SERIAL_LEFT_DATA_IN ), 
+                                                .Serial_out_left(SERIAL_LEFT_DATA_OUT),
+                                                .Serial_out_right(SERIAL_RIGHT_DATA_OUT),
+                                                .Parallel_in( Parallel_in_data ), 
+                                                .Parallel_out( PARALLEL_OUT_DATA ), 
+                                                .USHR_mode0( USHR_mode0_data),
+                                                .USHR_mode1(USHR_mode1_data ),
+                                                .USHR_mode2(USHR_mode2_data ),
+                                                .USHR_mode3(USHR_mode3_data ),
+                                                .control_s(CONTROL_2X1_MUX_SBOX_DATA));
+                                                
+    AES_USHR_CUSTOM RANDOM_x_1 (.CLOCK(CLOCK ), .RESET( RESET), .Serial_in_L ( 32'd0 ),
+                                               .Serial_out_left(SERIAL_LEFT_RANDOM_OUT),
+                                                .Serial_out_right(SERIAL_RIGHT_RANDOM_OUT), 
+                                               .Serial_in_R( SERIAL_RIGHT_RANDOM_IN  ), 
+                                               .Parallel_in( Parallel_in_RANDOM  ),                 
+                                               .Parallel_out( PARALLEL_OUT_RANDOM ),
+                                               .USHR_mode0( USHR_mode0_random),
+                                               .USHR_mode1(USHR_mode1_random ),
+                                               .USHR_mode2(USHR_mode2_random ),
+                                               .USHR_mode3(USHR_mode3_random )
+                                               ,.control_s(CONTROL_2X1_MUX_SBOX_RANDOM));                                            
+    
+    
+    shiftrows s_1 (.in(PARALLEL_OUT_DATA),.out(SHIFT_ROWS_DATA_OUT));
+    inverseshiftrows is_1(.in(PARALLEL_OUT_DATA),.out(INV_SHIFT_ROWS_DATA_OUT));
+    shiftrows s_2 (.in(PARALLEL_OUT_RANDOM),.out(SHIFT_ROWS_RANDOM_OUT));
+    inverseshiftrows is_2(.in(PARALLEL_OUT_RANDOM),.out(INV_SHIFT_ROWS_RANDOM_OUT));
+    
+    assign SHIFT_ROWS_OR_INVERSE_SHIFT_ROWS_OUT_DATA= E_D?SHIFT_ROWS_DATA_OUT:INV_SHIFT_ROWS_DATA_OUT;
+    assign  SHIFT_ROWS_OR_INVERSE_SHIFT_ROWS_OUT_RANDOM= E_D?SHIFT_ROWS_RANDOM_OUT:INV_SHIFT_ROWS_RANDOM_OUT;
+    
+    /////multiplexers used to select the round data: #########################################################
+    /////#####################################################################################################
+    
+    mux4x1 M0 (.d_in0(PARALLEL_OUT_DATA[127:96]), .d_in1(PARALLEL_OUT_DATA[95:64]), .d_in2(PARALLEL_OUT_DATA[63:32]), .d_in3(PARALLEL_OUT_DATA[31:0]),
+                             .d_out(data_32_out), .select({R1,R0}));
+                             
+    mux4x1 M1 (.d_in0(PARALLEL_OUT_RANDOM[127:96]), .d_in1(PARALLEL_OUT_RANDOM[95:64]), .d_in2(PARALLEL_OUT_RANDOM[63:32]), .d_in3(PARALLEL_OUT_RANDOM[31:0]),
+                              .d_out(RANDOM_32_out), .select({R1,R0}));
+    
+    
+    
+    mux4x18 M2 (.d_in0(RANDOM_32_out[31:24]), .d_in1(RANDOM_32_out[23:16]), .d_in2(RANDOM_32_out[15:8]), .d_in3(RANDOM_32_out[7:0]),
+                              .d_out(RANDOM_8_OUT), .select({S1,S0}));
+    
+    
+    mux4x18 M3 (.d_in0(data_32_out[31:24]), .d_in1(data_32_out[23:16]), .d_in2(data_32_out[15:8]), .d_in3(data_32_out[7:0]),
+                              .d_out(DATA_8_OUT), .select({S1,S0}));
+    
+    mux2x132 mselect (.d_in0(data_32_out), .d_in1(RANDOM_32_out), .d_out(ROUND_DATA_32), .select(b));
+    
+    
+    
+    assign CONTROL_2X1_MUX_SBOX_DATA[0] =   (   (~R1)  &&  (~R0)  &&  (~S1)  &&  (~S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_DATA[1] =   (   (~R1)  &&  (~R0)  &&  (~S1)  &&  (S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_DATA[2] =   (   (~R1)  &&  (~R0)  &&  (S1)  &&  (~S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_DATA[3] =   (   (~R1)  &&  (~R0)  &&  (S1)  &&  (S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_DATA[4] =   (   (~R1)  &&  (R0)   &&   (~S1)  &&  (~S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_DATA[5] =   (   (~R1)  &&  (R0)   &&   (~S1)  &&  (S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_DATA[6] =   (   (~R1)  &&  (R0)   &&   (S1)  &&  (~S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_DATA[7] =   (   (~R1)  &&  (R0)   &&   (S1)  &&  (S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_DATA[8] =   (   (R1)   &&  (~R0)  &&  (~S1)  &&  (~S0) ) ||  (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_DATA[9] =   (   (R1)   &&  (~R0)  &&  (~S1)  &&  (S0) ) ||  ( ~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_DATA[10]=   (   (R1)   &&  (~R0)  &&  (S1)  &&  (~S0) ) ||  (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_DATA[11]=   (   (R1)   &&  (~R0)  &&  (S1)  &&  (S0) ) ||   (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_DATA[12]=   (   (R1)   &&  (R0)   &&   (~S1)  &&  (~S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_DATA[13]=   (   (R1)   &&  (R0)   &&   (~S1)  &&  (S0) ) ||  (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_DATA[14]=   (   (R1)   &&  (R0)   &&   (S1)  &&  (~S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_DATA[15]=   (   (R1)   &&  (R0)   &&   (S1)  &&  (S0) ) || (~SBOX_ACTIVE); 
+    
+    
+    
+    assign CONTROL_2X1_MUX_SBOX_RANDOM[0]=    (   (~R1)  &&  (~R0)  &&  (~S1)  &&  (~S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_RANDOM[1]=    (   (~R1)  &&  (~R0)  &&  (~S1)  &&  (S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_RANDOM[2]=    (   (~R1)  &&  (~R0)  &&  (S1)  &&  (~S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_RANDOM[3]=    (   (~R1)  &&  (~R0)  &&  (S1)  &&  (S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_RANDOM[4]=    (   (~R1)  &&  (R0)  &&   (~S1)  &&  (~S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_RANDOM[5]=    (   (~R1)  &&  (R0)  &&   (~S1)  &&  (S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_RANDOM[6]=    (   (~R1)  &&  (R0)  &&   (S1)  &&  (~S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_RANDOM[7]=    (   (~R1)  &&  (R0)  &&   (S1)  &&  (S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_RANDOM[8]=    (   (R1)  &&  (~R0)  &&   (~S1)  &&  (~S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_RANDOM[9]=    (   (R1)  &&  (~R0)  &&   (~S1)  &&  (S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_RANDOM[10]=   (   (R1)  &&  (~R0)  &&   (S1)  &&  (~S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_RANDOM[11]=   (   (R1)  &&  (~R0)  &&   (S1)  &&  (S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_RANDOM[12]=   (   (R1)  &&  (R0)  &&    (~S1)  &&  (~S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_RANDOM[13]=   (   (R1)  &&  (R0)  &&    (~S1)  &&  (S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_RANDOM[14]=   (   (R1)  &&  (R0)  &&    (S1)  &&  (~S0) ) || (~SBOX_ACTIVE);
+    assign CONTROL_2X1_MUX_SBOX_RANDOM[15]=   (   (R1)  &&  (R0)  &&   (S1)  &&  (S0) ) || (~SBOX_ACTIVE); 
+
+
+
+endmodule
+
+
